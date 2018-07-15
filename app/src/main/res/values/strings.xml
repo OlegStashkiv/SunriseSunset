@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Sunrise&amp;Sunset_v2</string>
+    <string name="string_getting_json_title">Wait</string>
+    <string name="string_getting_json_message">Get informations</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+</resources>
