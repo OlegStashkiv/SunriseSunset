@@ -1,6 +1,7 @@
 package com.example.oleg.sunrisesunset_v2.ActivityClass;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -24,21 +25,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView sunrise;
-    private TextView sunset;
-    private TextView solar_noon;
-    private TextView day_length;
-    private TextView civil_twilight_begin;
-    private TextView civil_twilight_end;
-    private TextView nautical_twilight_begin;
-    private TextView nautical_twilight_end;
-    private TextView astronomical_twilight_begin;
-    private TextView astronomical_twilight_end;
+    private TextView sunrise, sunset, solar_noon, day_length, civil_twilight_begin, civil_twilight_end,
+            nautical_twilight_begin, nautical_twilight_end, astronomical_twilight_begin, astronomical_twilight_end;
+
     private LocationManager locationManager;
-    private LocationListener locationListener;
     private LinearLayout content_ss;
-    private String lat;
-    private String lng;
     private ProgressDialog dialog;
 
     @Override
@@ -53,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
         civil_twilight_begin = (TextView) findViewById(R.id.civil_twilight_begin);
         civil_twilight_end = (TextView) findViewById(R.id.civil_twilight_end);
         nautical_twilight_begin = (TextView) findViewById(R.id.nautical_twilight_begin);
-        nautical_twilight_end= (TextView) findViewById(R.id.nautical_twilight_end);
+        nautical_twilight_end = (TextView) findViewById(R.id.nautical_twilight_end);
         astronomical_twilight_begin = (TextView) findViewById(R.id.astronomical_twilight_begin);
-        astronomical_twilight_end= (TextView) findViewById(R.id.astronomical_twilight_end);
+        astronomical_twilight_end = (TextView) findViewById(R.id.astronomical_twilight_end);
         content_ss = (LinearLayout) findViewById(R.id.content_ss);
 
         dialog = new ProgressDialog(MainActivity.this);
@@ -63,58 +54,69 @@ public class MainActivity extends AppCompatActivity {
         dialog.setMessage(getString(R.string.string_getting_json_message));
         dialog.show();
 
-
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                double latitude = location.getLatitude();
-                lat = Double.toString(latitude);
-                double longitude = location.getLongitude();
-                lng = Double.toString(longitude);
-                getData();
-
-            }
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-            }
-        };
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.INTERNET
-                }, 10);
-            return;
-        }else {
-            locationManager.requestLocationUpdates("gps", 500000, 0, locationListener);
-        }
-
     }
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
+    public void onRequestPermissionsResult ( int requestCode, @NonNull String[] permissions,
+                                             @NonNull int[] grantResults){
+        switch (requestCode) {
             case 10:
-                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     return;
         }
     }
+    @Override
 
+    protected void onResume() {
+        super.onResume();
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.INTERNET
+            }, 10);
+            return;
+        }
+        locationManager.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER, 1000 * 10, 10,
+                locationListener);
 
-    private void getData(){
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(locationListener);
+    }
+
+    private LocationListener locationListener = new LocationListener() {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            getData(Double.toString(latitude), Double.toString(longitude));
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+    };
+
+    private void getData(String lat, String lng){
         Call<PostList> call = SandSApi.getPostService(SandSApi.url).getPostCity(lat, lng);
         call.enqueue(new Callback<PostList>() {
             @Override

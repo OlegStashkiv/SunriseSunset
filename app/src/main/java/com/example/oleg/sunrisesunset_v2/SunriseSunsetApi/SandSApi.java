@@ -10,8 +10,6 @@ import retrofit2.http.Query;
 public class SandSApi {
     public static final String url = "https://api.sunrise-sunset.org";
 
-    private static final String lat = "36.7201600";
-    private static final String lng = "-4.4203400";
 
     public static PostService postService = null;
     public static PostService getPostService(String s) {
@@ -29,8 +27,6 @@ public class SandSApi {
     }
 
     public interface PostService {
-        @GET("/json?lat="+lat+"&lng="+lng)
-        Call<PostList>  getPostList();
 
         @GET("/json")
         Call<PostList>  getPostCity(@Query("lat") String lat, @Query("lng") String lng  );

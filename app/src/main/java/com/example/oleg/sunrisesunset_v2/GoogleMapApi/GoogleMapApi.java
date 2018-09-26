@@ -11,7 +11,7 @@ import retrofit2.http.Query;
 
 public class GoogleMapApi {
     public static final String g_m_url = "https://maps.googleapis.com";
-    public static final String KEY = "AIzaSyBlb9Fn4Dis2FwO-URdMZHQulbiF6RSy9I";
+    public static final String KEY = "AIzaSyCVHqoRymahvbyoFCyTzwzxxzOaf3sXOCk";
 
     public static GoogleService googleService = null;
     public static GoogleService getgoogleService(String s) {
